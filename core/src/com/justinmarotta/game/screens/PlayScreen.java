@@ -28,7 +28,7 @@ public class PlayScreen implements Screen {
     private OrthographicCamera gamecam;
     private Viewport gamePort;
     private Hud hud;
-    private int camPos = 1;
+    private int camPos = 0;
 
     private Texture bg;
 
@@ -46,7 +46,6 @@ public class PlayScreen implements Screen {
 
     //bullets
     private Array<Bullet> bullets;
-    private int bulletCount = 0;
 
     //Constructor
     public PlayScreen(MarsTrip game) {
@@ -70,7 +69,7 @@ public class PlayScreen implements Screen {
 
         //init asteroid array
         asteroids = new Array<Asteroid>();
-        for (int i = 1; i<= ASTEROID_COUNT; i++){
+        for (int i = 1; i <= ASTEROID_COUNT; i++){
             asteroids.add(new Asteroid((rand.nextInt(MarsTrip.WIDTH * 3) + MarsTrip.WIDTH), rand.nextInt(Asteroid.HEIGHT_MAX)));
         }
 
@@ -173,20 +172,23 @@ public class PlayScreen implements Screen {
         for (int i = 0; i < bullets.size; i++){
             Bullet bullet = bullets.get(i);
             bullet.update(dt);
+
+            if (gamecam.position.x + (gamecam.viewportWidth / 2) < bullet.getPosition().x)
+                bullets.removeIndex(i);
         }
 
         //bullet asteroid collision
-        for (int i = 0; i < bullets.size; i++){
-            Bullet bullet = bullets.get(i);
-
-            for (int j = 0; j < asteroids.size; j++){
-                Asteroid asteroid = asteroids.get(j);
-
-                if (bullet.collides(asteroid.getBounds()))
-                    Hud.addScore(100);
-                    asteroid.reposition(camPos + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.HEIGHT_MAX));
-            }
-        }
+//        for (int i = 0; i < bullets.size; i++){
+//            Bullet bullet = bullets.get(i);
+//
+//            for (int j = 0; j < asteroids.size; j++){
+//                Asteroid asteroid = asteroids.get(j);
+//
+//                if (bullet.collides(asteroid.getBounds()))
+//                    Hud.addScore(100);
+//                    asteroid.reposition(camPos + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.HEIGHT_MAX));
+//            }
+//        }
 
         gamecam.update();
     }
