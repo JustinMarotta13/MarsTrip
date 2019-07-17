@@ -5,7 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.justinmarotta.game.MarsTrip;
@@ -25,15 +25,20 @@ import static com.badlogic.gdx.Input.Keys.SPACE;
 import static com.badlogic.gdx.Input.Keys.W;
 
 public class PlayScreen implements Screen {
+
     private MarsTrip game;
     private OrthographicCamera gamecam;
     private Viewport gamePort;
     private Hud hud;
-    private int camPos = 0;
+    private int leftShipBound = 0;
+    private int leftShipBoundInc = (Ship.MOVEMENT / 60);
 
     private Random rand;
 
     private Texture bg;
+
+    private Texture ground;
+    private Vector2 groundPos1, groundPos2;
 
     private Ship ship;
 
@@ -44,8 +49,8 @@ public class PlayScreen implements Screen {
 
     //asteroids
     private float asteroidSpawnTimer;
-    private static final float MIN_ASTEROID_SPWAN_TIME = .5f;
-    private static final float MAX_ASTEROID_SPWAN_TIME = 2f;
+    private static final float MIN_ASTEROID_SPAWN_TIME = .5f;
+    private static final float MAX_ASTEROID_SPAWN_TIME = 2f;
     private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
     private ArrayList<Asteroid> rmAsteroids = new ArrayList<Asteroid>();
 
@@ -67,21 +72,25 @@ public class PlayScreen implements Screen {
 
         bg = new Texture("bg.png");
 
+        ground = new Texture("ground.png");
+        groundPos1 = new Vector2(gamePort.getScreenWidth(), 0);
+        groundPos2 = new Vector2(ground.getWidth(), 0);
+
         ship = new Ship(55, 200);
 
         //init asteroid timer
-        asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPWAN_TIME - MIN_ASTEROID_SPWAN_TIME) + MIN_ASTEROID_SPWAN_TIME;
+        asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
 
     }
 
     public void handleInput(float dt) {
-        if (Gdx.input.isKeyPressed(W) && ship.position.y < 380)
+        if (Gdx.input.isKeyPressed(W) && ship.position.y < 350)
             ship.moveUp();
-        if (Gdx.input.isKeyPressed(S))
+        if (Gdx.input.isKeyPressed(S) && ship.position.y > 20)
             ship.moveDown();
-        if (Gdx.input.isKeyPressed(A) && ship.position.x > camPos)
+        if (Gdx.input.isKeyPressed(A) && ship.position.x > leftShipBound)
             ship.moveLeft();
-        if (Gdx.input.isKeyPressed(D) && ship.position.x < 200 + camPos)
+        if (Gdx.input.isKeyPressed(D) && ship.position.x < 200 + leftShipBound)
             ship.moveRight();
         if (Gdx.input.isKeyJustPressed(SPACE)) {
             bullets.add(new Bullet(ship.position.x + 20, ship.position.y + 12));
@@ -97,7 +106,8 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gamecam.combined);
         game.batch.begin();
-        game.batch.draw(bg, gamecam.position.x - 120, gamecam.position.y - 200);
+
+        game.batch.draw(bg, leftShipBound, 0);
 
         //draw bullets
         for (Bullet bullet : bullets){
@@ -109,22 +119,26 @@ public class PlayScreen implements Screen {
 
         //draw towers
         towerTimer = towerTimer + .625;
-        if (towerTimer % 60 == 0)
-            towers.add(new Tower(camPos + (MarsTrip.WIDTH / 2) + Tower.TOWER_WIDTH));
+        if (towerTimer % 60 == 0) {
+            towers.add(new Tower(leftShipBound + (MarsTrip.WIDTH / 2) + Tower.TOWER_WIDTH));
+        }
         for (Tower tower : towers){
-            game.batch.draw(tower.getTopTower(), tower.getPosTopTower().x, tower.getPosTopTower().y);
-            game.batch.draw(tower.getBottomTower(), tower.getPosBotTower().x, tower.getPosBotTower().y);
+            game.batch.draw(tower.getTower(), tower.getTowerPos().x, tower.getTowerPos().y);
         }
 
         //draw asteroids
         asteroidSpawnTimer -= delta;
         if (asteroidSpawnTimer <= 0){
-            asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPWAN_TIME - MIN_ASTEROID_SPWAN_TIME) + MIN_ASTEROID_SPWAN_TIME;
-            asteroids.add(new Asteroid(camPos + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.MAX_HEIGHT) + Asteroid.MIN_HEIGHT));
+            asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
+            asteroids.add(new Asteroid(leftShipBound + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.MAX_HEIGHT) + Asteroid.MIN_HEIGHT));
         }
         for (Asteroid asteroid : asteroids) {
             game.batch.draw(asteroid.getTexture(), asteroid.getPosition().x, asteroid.getPosition().y);
         }
+
+        //draw ground
+        game.batch.draw(ground, groundPos1.x, groundPos1.y);
+        game.batch.draw(ground, groundPos2.x, groundPos2.y);
 
         //end game batch
         game.batch.end();
@@ -136,20 +150,22 @@ public class PlayScreen implements Screen {
 
     public void update(float dt) {
         handleInput(dt);
-        gamecam.position.add(4, 0, 0);
 
-        //int for camera location
-        camPos = camPos + (Ship.MOVEMENT / 60);
+        //cam positioning
+        gamecam.position.add(leftShipBoundInc, 0, 0);
+        leftShipBound = leftShipBound + leftShipBoundInc;
 
         hud.update(dt);
 
         ship.update(dt);
 
+        updateGround();
+
+
         //update towers
         for (Tower tower : towers){
 
-            if (gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getPosTopTower().x + tower.getTopTower().getWidth()
-                    && gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getPosBotTower().x + tower.getBottomTower().getWidth()){
+            if (gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getTowerPos().x + tower.getTower().getWidth()){
                 rmTowers.add(tower);
                 Hud.addScore(100);
             }
@@ -199,6 +215,13 @@ public class PlayScreen implements Screen {
         gamecam.update();
     }
 
+    private void updateGround(){
+        if (gamecam.position.x - (gamecam.viewportWidth / 2) > groundPos1.x + ground.getWidth())
+            groundPos1.add(ground.getWidth() * 2, 0);
+        if (gamecam.position.x - (gamecam.viewportWidth / 2)  > groundPos2.x + ground.getWidth())
+            groundPos2.add(ground.getWidth() * 2, 0);
+    }
+
     @Override
     public void resize(int width, int height) {
         gamePort.update(width, height);
@@ -228,6 +251,7 @@ public class PlayScreen implements Screen {
     public void dispose() {
         bg.dispose();
         ship.dispose();
+        ground.dispose();
         for (Tower tower : towers){
             tower.dispose();
         }

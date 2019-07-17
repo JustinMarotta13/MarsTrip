@@ -15,7 +15,7 @@ public class Bullet {
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
         texture = new Texture("bullet.png");
-        bounds = new Rectangle(x - 2, y + 2, texture.getWidth() + 2, texture.getHeight() + 2);
+        bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
     }
 
     public void update(float dt){

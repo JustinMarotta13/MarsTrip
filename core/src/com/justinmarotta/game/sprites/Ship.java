@@ -26,8 +26,6 @@ public class Ship {
         velocity.scl(dt);
         position.add(MOVEMENT * dt, velocity.y, 0);
         position.add(0, velocity.y, 0);
-        if (position.y < 0)
-            position.y = 0;
         velocity.scl(1/dt);
         bounds.setPosition(position.x, position.y);
     }

@@ -8,62 +8,46 @@ import com.justinmarotta.game.MarsTrip;
 import java.util.Random;
 
 public class Tower {
+
     public static final int TOWER_WIDTH = 52;
-    private static final int LOWEST_SPAWN = -260;
-    private static final int GAP_MIN = 60;
-    private static final int MAX_GAP_ADDITION = 80;
-    private static int botHeight;
+    private static final int LOWEST_SPAWN = -220;
+    private static int towerHeight;
     private static int towerGap;
 
-    private Texture topTower, bottomTower;
-    private Vector2 posTopTower, posBotTower;
-    private Rectangle boundsTop, boundsBot;
+    private Texture tower;
+    private Vector2 towerPos;
+    private Rectangle bounds;
     private Random rand;
 
     public Tower(float x){
-        topTower = new Texture("toptower.png");
-        bottomTower = new Texture("bottomtower.png");
+        tower = new Texture("tower.png");
         rand = new Random();
 
-        posBotTower = new Vector2(x, LOWEST_SPAWN +  genBotHeight());
-        posTopTower = new Vector2(x + 160 + 26, posBotTower.y + topTower.getHeight() + genTowerGap());
+        towerPos = new Vector2(x, LOWEST_SPAWN +  genTowerHeight());
 
-        boundsTop = new Rectangle(posTopTower.x, posTopTower.y, topTower.getWidth(), topTower.getHeight());
-        boundsBot = new Rectangle(posBotTower.x, posBotTower.y, bottomTower.getWidth(), bottomTower.getHeight());
+        bounds = new Rectangle(towerPos.x, towerPos.y, tower.getWidth(), tower.getHeight());
     }
 
-    private int genBotHeight(){
-        botHeight = rand.nextInt(MarsTrip.HEIGHT / 4);
-        return botHeight;
-    }
-
-    private int genTowerGap(){
-        towerGap = rand.nextInt(MAX_GAP_ADDITION) + GAP_MIN;
-        return towerGap;
+    private int genTowerHeight(){
+        towerHeight = rand.nextInt(MarsTrip.HEIGHT / 4);
+        return towerHeight;
     }
 
     public boolean collides(Rectangle rect){
-        return rect.overlaps(boundsTop) || rect.overlaps(boundsBot);
+        return rect.overlaps(bounds) || rect.overlaps(bounds);
     }
 
-    public Texture getTopTower() {
-        return topTower;
+
+    public Texture getTower() {
+        return tower;
     }
 
-    public Texture getBottomTower() {
-        return bottomTower;
-    }
 
-    public Vector2 getPosTopTower() {
-        return posTopTower;
-    }
-
-    public Vector2 getPosBotTower() {
-        return posBotTower;
+    public Vector2 getTowerPos() {
+        return towerPos;
     }
 
     public void dispose(){
-        topTower.dispose();
-        bottomTower.dispose();
+        tower.dispose();
     }
 }
