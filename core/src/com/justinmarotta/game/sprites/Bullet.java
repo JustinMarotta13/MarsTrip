@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
 public class Bullet {
-    public static final int MOVEMENT = 700;
-    public Vector3 position;
+    private static final int MOVEMENT = 700;
+    private Vector3 position;
     private Vector3 velocity;
     private Rectangle bounds;
     private Texture texture;
@@ -15,7 +15,7 @@ public class Bullet {
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
         texture = new Texture("bullet.png");
-        bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
+        bounds = new Rectangle(x - 2, y + 2, texture.getWidth() + 2, texture.getHeight() + 2);
     }
 
     public void update(float dt){
@@ -26,8 +26,8 @@ public class Bullet {
         bounds.setPosition(position.x, position.y);
     }
 
-    public boolean collides(Rectangle asteroid){
-        return asteroid.overlaps(bounds);
+    public boolean collides(Rectangle rect){
+        return rect.overlaps(bounds);
     }
 
     public Vector3 getPosition() {

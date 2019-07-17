@@ -33,19 +33,19 @@ public class Ship {
     }
 
     public void moveUp(){
-        position.add(0, 5, 0);
+        position.add(0, 4, 0);
     }
 
     public void moveDown(){
-        position.add(0, -5, 0);
+        position.add(0, -4, 0);
     }
 
     public void moveLeft(){
-        position.add(-5, 0, 0);
+        position.add(-3, 0, 0);
     }
 
     public void moveRight(){
-        position.add(5, 0, 0);
+        position.add(2, 0, 0);
     }
 
     public TextureRegion getTexture() {

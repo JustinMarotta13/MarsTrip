@@ -15,6 +15,7 @@ import com.justinmarotta.game.sprites.Bullet;
 import com.justinmarotta.game.sprites.Ship;
 import com.justinmarotta.game.sprites.Tower;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static com.badlogic.gdx.Input.Keys.A;
@@ -30,22 +31,29 @@ public class PlayScreen implements Screen {
     private Hud hud;
     private int camPos = 0;
 
+    private Random rand;
+
     private Texture bg;
 
     private Ship ship;
 
     //towers
-    private static final int TOWER_SPACING = 300;
-    private static final int TOWER_COUNT = 4;
-    private Array<Tower> towers;
+    private double towerTimer = 0;
+    private ArrayList<Tower> towers = new ArrayList<Tower>();
+    private ArrayList<Tower> rmTowers = new ArrayList<Tower>();
 
     //asteroids
-    private static final int ASTEROID_COUNT = 5;
-    private Array<Asteroid> asteroids;
-    private Random rand;
+    private float asteroidSpawnTimer;
+    private static final float MIN_ASTEROID_SPWAN_TIME = .5f;
+    private static final float MAX_ASTEROID_SPWAN_TIME = 2f;
+    private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
+    private ArrayList<Asteroid> rmAsteroids = new ArrayList<Asteroid>();
 
     //bullets
-    private Array<Bullet> bullets;
+    private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+    private ArrayList<Bullet> rmBullets = new ArrayList<Bullet>();
+
+    //score to be added array
 
     //Constructor
     public PlayScreen(MarsTrip game) {
@@ -61,20 +69,9 @@ public class PlayScreen implements Screen {
 
         ship = new Ship(55, 200);
 
-        //init tower array
-        towers = new Array<Tower>();
-        for (int i = 1; i <= TOWER_COUNT; i++){
-            towers.add(new Tower(i * (TOWER_SPACING + Tower.TOWER_WIDTH)));
-        }
+        //init asteroid timer
+        asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPWAN_TIME - MIN_ASTEROID_SPWAN_TIME) + MIN_ASTEROID_SPWAN_TIME;
 
-        //init asteroid array
-        asteroids = new Array<Asteroid>();
-        for (int i = 1; i <= ASTEROID_COUNT; i++){
-            asteroids.add(new Asteroid((rand.nextInt(MarsTrip.WIDTH * 3) + MarsTrip.WIDTH), rand.nextInt(Asteroid.HEIGHT_MAX)));
-        }
-
-        //init bullet array
-        bullets = new Array<Bullet>();
     }
 
     public void handleInput(float dt) {
@@ -94,10 +91,11 @@ public class PlayScreen implements Screen {
     @Override
     public void render(float delta) {
         update(delta);
+
+        //clears screen and begins sprite batch
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gamecam.combined);
-
         game.batch.begin();
         game.batch.draw(bg, gamecam.position.x - 120, gamecam.position.y - 200);
 
@@ -110,16 +108,25 @@ public class PlayScreen implements Screen {
         game.batch.draw(ship.getTexture(), ship.getPosition().x, ship.getPosition().y);
 
         //draw towers
+        towerTimer = towerTimer + .625;
+        if (towerTimer % 60 == 0)
+            towers.add(new Tower(camPos + (MarsTrip.WIDTH / 2) + Tower.TOWER_WIDTH));
         for (Tower tower : towers){
             game.batch.draw(tower.getTopTower(), tower.getPosTopTower().x, tower.getPosTopTower().y);
             game.batch.draw(tower.getBottomTower(), tower.getPosBotTower().x, tower.getPosBotTower().y);
         }
 
         //draw asteroids
+        asteroidSpawnTimer -= delta;
+        if (asteroidSpawnTimer <= 0){
+            asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPWAN_TIME - MIN_ASTEROID_SPWAN_TIME) + MIN_ASTEROID_SPWAN_TIME;
+            asteroids.add(new Asteroid(camPos + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.MAX_HEIGHT) + Asteroid.MIN_HEIGHT));
+        }
         for (Asteroid asteroid : asteroids) {
             game.batch.draw(asteroid.getTexture(), asteroid.getPosition().x, asteroid.getPosition().y);
         }
 
+        //end game batch
         game.batch.end();
 
         //draw what hud sees
@@ -139,28 +146,25 @@ public class PlayScreen implements Screen {
         ship.update(dt);
 
         //update towers
-        for (int i = 0; i < towers.size; i++){
-
-            Tower tower = towers.get(i);
+        for (Tower tower : towers){
 
             if (gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getPosTopTower().x + tower.getTopTower().getWidth()
                     && gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getPosBotTower().x + tower.getBottomTower().getWidth()){
-
-                tower.reposition(tower.getPosTopTower().x + ((Tower.TOWER_WIDTH + TOWER_SPACING) * TOWER_COUNT));
-                Hud.addScore(150);
+                rmTowers.add(tower);
+                Hud.addScore(100);
             }
 
             if (tower.collides(ship.getBounds()))
                 game.setScreen(new GameOverScreen(game));
         }
+        towers.removeAll(rmTowers);
 
         //update asteroids
-        for (int i = 0; i < asteroids.size; i++) {
-            Asteroid asteroid = asteroids.get(i);
+        for (Asteroid asteroid : asteroids) {
             asteroid.update(dt);
 
             if (gamecam.position.x - (gamecam.viewportWidth / 2) > asteroid.getPosition().x + asteroid.getTexture().getWidth()){
-                asteroid.reposition(camPos + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.HEIGHT_MAX));
+                rmAsteroids.add(asteroid);
                 Hud.addScore(50);
             }
 
@@ -169,27 +173,29 @@ public class PlayScreen implements Screen {
         }
 
         //update bullets
-        for (int i = 0; i < bullets.size; i++){
-            Bullet bullet = bullets.get(i);
+        for (Bullet bullet : bullets) {
             bullet.update(dt);
 
-            if (gamecam.position.x + (gamecam.viewportWidth / 2) < bullet.getPosition().x)
-                bullets.removeIndex(i);
+            if (gamecam.position.x + (gamecam.viewportWidth / 2) < bullet.getPosition().x){
+                rmBullets.add(bullet);
+            }
         }
 
-        //bullet asteroid collision
-//        for (int i = 0; i < bullets.size; i++){
-//            Bullet bullet = bullets.get(i);
-//
-//            for (int j = 0; j < asteroids.size; j++){
-//                Asteroid asteroid = asteroids.get(j);
-//
-//                if (bullet.collides(asteroid.getBounds()))
-//                    Hud.addScore(100);
-//                    asteroid.reposition(camPos + (rand.nextInt(MarsTrip.WIDTH * 4) + MarsTrip.WIDTH), rand.nextInt(Asteroid.HEIGHT_MAX));
-//            }
-//        }
+        //asteroid bullet collision
+        for (Bullet bullet : bullets){
+            for (Asteroid asteroid : asteroids){
+                if (bullet.collides(asteroid.getBounds())){
+                    rmAsteroids.add(asteroid);
+                    rmBullets.add(bullet);
+                    Hud.addScore(250);
+                }
+            }
+        }
 
+        asteroids.removeAll(rmAsteroids);
+        bullets.removeAll(rmBullets);
+
+        //update the game camera
         gamecam.update();
     }
 
@@ -225,10 +231,19 @@ public class PlayScreen implements Screen {
         for (Tower tower : towers){
             tower.dispose();
         }
+        for (Tower tower : rmTowers){
+            tower.dispose();
+        }
         for (Asteroid asteroid : asteroids){
             asteroid.dispose();
         }
+        for (Asteroid asteroid : rmAsteroids){
+            asteroid.dispose();
+        }
         for (Bullet bullet : bullets){
+            bullet.dispose();
+        }
+        for (Bullet bullet : rmBullets){
             bullet.dispose();
         }
     }
