@@ -5,20 +5,21 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-public class Ship {
-    public static final int MOVEMENT = 240;
+public class Rover {
+    public static final int HEIGHT = 20;
+    private static final int MOVEMENT = 175;
     public Vector3 position;
     private Vector3 velocity;
     private Rectangle bounds;
     private Animation animation;
     private Texture texture;
 
-    public Ship(int x, int y) {
-        position = new Vector3(x, y, 0);
+    public Rover(float x) {
+        position = new Vector3(x, HEIGHT, 0);
         velocity = new Vector3(0, 0, 0);
-        texture = new Texture("shipanimation.png");
-        animation = new Animation(new TextureRegion(texture), 3, 0.25f);
-        bounds = new Rectangle(x, y, texture.getWidth() / 3, texture.getHeight());
+        texture = new Texture("roveranimation.png");
+        animation = new Animation(new TextureRegion(texture), 3, 0.5f);
+        bounds = new Rectangle(x, HEIGHT, texture.getWidth() / 3, texture.getHeight());
     }
 
     public void update(float dt){
@@ -30,20 +31,8 @@ public class Ship {
         bounds.setPosition(position.x, position.y);
     }
 
-    public void moveUp(){
-        position.add(0, 5, 0);
-    }
-
-    public void moveDown(){
-        position.add(0, -5, 0);
-    }
-
-    public void moveLeft(){
-        position.add(-4, 0, 0);
-    }
-
-    public void moveRight(){
-        position.add(3, 0, 0);
+    public boolean collides(Rectangle rect){
+        return rect.overlaps(bounds);
     }
 
     public TextureRegion getTexture() {

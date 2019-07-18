@@ -37,8 +37,7 @@ public class Tower {
         return rect.overlaps(bounds) || rect.overlaps(bounds);
     }
 
-
-    public Texture getTower() {
+    public Texture getTexture() {
         return tower;
     }
 

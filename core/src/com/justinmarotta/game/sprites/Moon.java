@@ -5,17 +5,17 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.justinmarotta.game.MarsTrip;
 
-public class Asteroid {
-    private static final int MOVEMENT = -100;
-    public static final int MIN_HEIGHT = 20;
-    public static final int MAX_HEIGHT = (MarsTrip.HEIGHT / 2) - MIN_HEIGHT - 40;
+public class Moon {
+    private static final int MOVEMENT = 150;
+    public static final int MIN_HEIGHT = 60;
+    public static final int MAX_HEIGHT = (MarsTrip.HEIGHT / 2) - MIN_HEIGHT - 140;
     private Vector3 position;
     private Vector3 velocity;
     private Texture texture;
     private Rectangle bounds;
 
-    public Asteroid(float x, int y){
-        texture = new Texture("asteroid.png");
+    public Moon(float x, int y){
+        texture = new Texture("moon.png");
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
         bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
