@@ -18,7 +18,7 @@ public class Ship {
         velocity = new Vector3(0, 0, 0);
         texture = new Texture("shipanimation.png");
         animation = new Animation(new TextureRegion(texture), 3, 0.25f);
-        bounds = new Rectangle(x, y, texture.getWidth() / 3, texture.getHeight());
+        bounds = new Rectangle(x + 10, y, (texture.getWidth() / 3) - 10, texture.getHeight());
     }
 
     public void update(float dt){

@@ -2,6 +2,7 @@ package com.justinmarotta.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,6 +16,7 @@ import com.justinmarotta.game.sprites.Bullet;
 import com.justinmarotta.game.sprites.Moon;
 import com.justinmarotta.game.sprites.Rover;
 import com.justinmarotta.game.sprites.Ship;
+import com.justinmarotta.game.sprites.SmallExplosion;
 import com.justinmarotta.game.sprites.Tower;
 import com.justinmarotta.game.sprites.UFO;
 
@@ -79,10 +81,14 @@ public class PlayScreen implements Screen {
 
     //rovers
     private float roverSpawnTimer = 0;
-    private static final float MIN_ROVER_SPAWN_TIME = 2f;
-    private static final float MAX_ROVER_SPAWN_TIME = 6f;
+    private static final float MIN_ROVER_SPAWN_TIME = 15f;
+    private static final float MAX_ROVER_SPAWN_TIME = 30f;
     private ArrayList<Rover> rovers = new ArrayList<Rover>();
     private ArrayList<Rover> rmRovers = new ArrayList<Rover>();
+
+    //small explosions
+    private ArrayList<SmallExplosion> smallExplosions = new ArrayList<SmallExplosion>();
+    private  ArrayList<SmallExplosion> rmSmallExplosions = new ArrayList<SmallExplosion>();
 
 
     //Constructor
@@ -102,6 +108,7 @@ public class PlayScreen implements Screen {
         groundPos2 = new Vector2(ground.getWidth(), 0);
 
         ship = new Ship(55, 200);
+        MarsTrip.manager.get("audio/ship.ogg", Sound.class).loop(.05f);
 
 
         //init asteroid timer
@@ -132,6 +139,7 @@ public class PlayScreen implements Screen {
             ship.moveRight();
         if (Gdx.input.isKeyJustPressed(SPACE)) {
             bullets.add(new Bullet(ship.position.x + 20, ship.position.y + 8));
+            MarsTrip.manager.get("audio/bullet.ogg", Sound.class).play();
         }
     }
 
@@ -172,6 +180,7 @@ public class PlayScreen implements Screen {
         if (asteroidSpawnTimer <= 0){
             asteroidSpawnTimer = rand.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
             asteroids.add(new Asteroid(gamecam.position.x + (gamecam.viewportWidth / 2), rand.nextInt(Asteroid.MAX_HEIGHT) + Asteroid.MIN_HEIGHT));
+            MarsTrip.manager.get("audio/asteroid.ogg", Sound.class).play();
         }
         for (Asteroid asteroid : asteroids) {
             game.batch.draw(asteroid.getTexture(), asteroid.getPosition().x, asteroid.getPosition().y);
@@ -182,6 +191,7 @@ public class PlayScreen implements Screen {
         if (ufoSpawnTimer <= 0){
             ufoSpawnTimer = rand.nextFloat() * (MAX_UFO_SPAWN_TIME - MIN_UFO_SPAWN_TIME) + MIN_UFO_SPAWN_TIME;
             ufos.add(new UFO(gamecam.position.x + (gamecam.viewportWidth / 2)));
+            MarsTrip.manager.get("audio/ufo.ogg", Sound.class).play();
         }
         for (UFO ufo : ufos) {
             game.batch.draw(ufo.getTexture(), ufo.getPosition().x, ufo.getPosition().y);
@@ -204,6 +214,11 @@ public class PlayScreen implements Screen {
 
         //draw ship
         game.batch.draw(ship.getTexture(), ship.getPosition().x, ship.getPosition().y);
+
+        //draw small explosions
+        for (SmallExplosion smallExplosion : smallExplosions){
+            game.batch.draw(smallExplosion.getTexture(), smallExplosion.getPosition().x, smallExplosion.getPosition().y);
+        }
 
         //draw ground
         game.batch.draw(ground, groundPos1.x, groundPos1.y);
@@ -248,8 +263,10 @@ public class PlayScreen implements Screen {
                 Hud.addScore(50);
             }
 
-            if (asteroid.collides(ship.getBounds()))
+            if (asteroid.collides(ship.getBounds())) {
                 game.setScreen(new GameOverScreen(game));
+                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+            }
         }
 
         //update ufos
@@ -261,9 +278,12 @@ public class PlayScreen implements Screen {
                 Hud.addScore(150);
             }
 
-            if (ufo.collides(ship.getBounds()))
+            if (ufo.collides(ship.getBounds())) {
                 game.setScreen(new GameOverScreen(game));
+                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+            }
         }
+        ufos.removeAll(rmUfos);
 
         //asteroid bullet collision
         for (Bullet bullet : bullets){
@@ -271,6 +291,8 @@ public class PlayScreen implements Screen {
                 if (bullet.collides(asteroid.getBounds())){
                     rmAsteroids.add(asteroid);
                     rmBullets.add(bullet);
+                    smallExplosions.add(new SmallExplosion(asteroid.getPosition().x, asteroid.getPosition().y, Asteroid.MOVEMENT));
+                    MarsTrip.manager.get("audio/smallexplosion.ogg", Sound.class).play();
                     Hud.addScore(250);
                 }
             }
@@ -288,15 +310,17 @@ public class PlayScreen implements Screen {
         bullets.removeAll(rmBullets);
 
         //update towers
-        for (Tower tower : towers){
+        for (Tower tower : towers) {
 
-            if (gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getTowerPos().x + tower.getTexture().getWidth()){
+            if (gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getTowerPos().x + tower.getTexture().getWidth()) {
                 rmTowers.add(tower);
                 Hud.addScore(100);
             }
 
-            if (tower.collides(ship.getBounds()))
+            if (tower.collides(ship.getBounds())){
                 game.setScreen(new GameOverScreen(game));
+                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+            }
         }
         towers.removeAll(rmTowers);
 
@@ -309,11 +333,14 @@ public class PlayScreen implements Screen {
                 Hud.addScore(200);
             }
 
-            if (moon.collides(ship.getBounds()))
+            if (moon.collides(ship.getBounds())) {
                 game.setScreen(new GameOverScreen(game));
+                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+            }
         }
         moons.removeAll(rmMoons);
 
+        //update rovers
         for (Rover rover : rovers){
             rover.update(dt);
 
@@ -321,6 +348,18 @@ public class PlayScreen implements Screen {
                 rmRovers.add(rover);
             }
         }
+        rovers.removeAll(rmRovers);
+
+
+        //update small explosions
+        for (SmallExplosion smallExplosion : smallExplosions){
+            smallExplosion.update(dt);
+
+            if (gamecam.position.x - (gamecam.viewportWidth / 2) > smallExplosion.getPosition().x + smallExplosion.getTexture().getRegionWidth()){
+                rmSmallExplosions.add(smallExplosion);
+            }
+        }
+        smallExplosions.removeAll(rmSmallExplosions);
 
         //update the game camera
         gamecam.update();
