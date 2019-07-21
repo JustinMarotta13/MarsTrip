@@ -35,6 +35,7 @@ public class MenuScreen implements Screen {
     public void handleInput(float dt) {
         if (Gdx.input.isKeyJustPressed(SPACE)){
             game.setScreen(new PlayScreen(game));
+            MarsTrip.playMusic();
         }
     }
 
@@ -46,8 +47,8 @@ public class MenuScreen implements Screen {
         game.batch.setProjectionMatrix(gamecam.combined);
         game.batch.begin();
         game.batch.draw(bg, 0, 0);
-        game.batch.draw(title, 49, 280);
-        game.batch.draw(playBtn, gamecam.position.x - playBtn.getWidth() / 2, gamecam.position.y);
+        game.batch.draw(title, gamecam.position.x - title.getWidth() / 2, gamecam.position.y + 50);
+        game.batch.draw(playBtn, gamecam.position.x - playBtn.getWidth() / 2, gamecam.position.y - 50);
         game.batch.end();
     }
 

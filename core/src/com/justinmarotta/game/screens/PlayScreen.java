@@ -25,8 +25,12 @@ import java.util.Random;
 
 import static com.badlogic.gdx.Input.Keys.A;
 import static com.badlogic.gdx.Input.Keys.D;
+import static com.badlogic.gdx.Input.Keys.DOWN;
+import static com.badlogic.gdx.Input.Keys.LEFT;
+import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.S;
 import static com.badlogic.gdx.Input.Keys.SPACE;
+import static com.badlogic.gdx.Input.Keys.UP;
 import static com.badlogic.gdx.Input.Keys.W;
 
 public class PlayScreen implements Screen {
@@ -54,7 +58,7 @@ public class PlayScreen implements Screen {
     //asteroids
     private float asteroidSpawnTimer;
     private static final float MIN_ASTEROID_SPAWN_TIME = .5f;
-    private static final float MAX_ASTEROID_SPAWN_TIME = 2f;
+    private static final float MAX_ASTEROID_SPAWN_TIME = 1.75f;
     private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
     private ArrayList<Asteroid> rmAsteroids = new ArrayList<Asteroid>();
 
@@ -67,15 +71,15 @@ public class PlayScreen implements Screen {
 
     //moons
     private float moonSpawnTimer = 0;
-    private static final float MIN_MOON_SPAWN_TIME = 10f;
-    private static final float MAX_MOON_SPAWN_TIME = 30f;
+    private static final float MIN_MOON_SPAWN_TIME = 5f;
+    private static final float MAX_MOON_SPAWN_TIME = 15f;
     private ArrayList<Moon> moons = new ArrayList<Moon>();
     private ArrayList<Moon> rmMoons = new ArrayList<Moon>();
 
     //ufos
     private float ufoSpawnTimer = 0;
-    private static final float MIN_UFO_SPAWN_TIME = 5f;
-    private static final float MAX_UFO_SPAWN_TIME = 15f;
+    private static final float MIN_UFO_SPAWN_TIME = 3f;
+    private static final float MAX_UFO_SPAWN_TIME = 10f;
     private ArrayList<UFO> ufos = new ArrayList<UFO>();
     private ArrayList<UFO> rmUfos = new ArrayList<UFO>();
 
@@ -129,13 +133,21 @@ public class PlayScreen implements Screen {
     }
 
     public void handleInput(float dt) {
-        if (Gdx.input.isKeyPressed(W) && ship.position.y < 360)
+        if (Gdx.input.isKeyPressed(W) && ship.position.y < (gamePort.getWorldHeight() - 40))
             ship.moveUp();
-        if (Gdx.input.isKeyPressed(S) && ship.position.y > 20)
+        if (Gdx.input.isKeyPressed(S) && ship.position.y > ground.getHeight())
             ship.moveDown();
         if (Gdx.input.isKeyPressed(A) && ship.position.x > leftShipBound)
             ship.moveLeft();
-        if (Gdx.input.isKeyPressed(D) && ship.position.x < 200 + leftShipBound)
+        if (Gdx.input.isKeyPressed(D) && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth())
+            ship.moveRight();
+        if (Gdx.input.isKeyPressed(UP) && ship.position.y < (gamePort.getWorldHeight() - 40) && !Gdx.input.isKeyPressed(W))
+            ship.moveUp();
+        if (Gdx.input.isKeyPressed(DOWN) && ship.position.y > ground.getHeight() && !Gdx.input.isKeyPressed(S))
+            ship.moveDown();
+        if (Gdx.input.isKeyPressed(LEFT) && ship.position.x > leftShipBound && !Gdx.input.isKeyPressed(A))
+            ship.moveLeft();
+        if (Gdx.input.isKeyPressed(RIGHT) && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth() && !Gdx.input.isKeyPressed(D))
             ship.moveRight();
         if (Gdx.input.isKeyJustPressed(SPACE)) {
             bullets.add(new Bullet(ship.position.x + 20, ship.position.y + 8));

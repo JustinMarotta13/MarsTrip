@@ -42,11 +42,11 @@ public class Hud implements Disposable {
         timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         playerLabel = new Label("PLAYER", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
-        table.add(playerLabel).padLeft(-380).padTop(10);
-        table.add(timeLabel).padRight(-380).padTop(10);
+        table.add(playerLabel).padLeft(-(MarsTrip.WIDTH) + 100).padTop(10);
+        table.add(timeLabel).padRight(-(MarsTrip.WIDTH) + 100).padTop(10);
         table.row();
-        table.add(scoreLabel).padLeft(-380);
-        table.add(countLabel).padRight(-380);
+        table.add(scoreLabel).padLeft(-(MarsTrip.WIDTH) + 100);
+        table.add(countLabel).padRight(-(MarsTrip.WIDTH) + 100);
 
         stage.addActor(table);
     }

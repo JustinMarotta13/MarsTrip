@@ -9,10 +9,8 @@ import java.util.Random;
 
 public class Tower {
 
-    public static final int TOWER_WIDTH = 52;
     private static final int LOWEST_SPAWN = -220;
     private static int towerHeight;
-    private static int towerGap;
 
     private Texture tower;
     private Vector2 towerPos;
@@ -22,9 +20,7 @@ public class Tower {
     public Tower(float x){
         tower = new Texture("tower.png");
         rand = new Random();
-
         towerPos = new Vector2(x, LOWEST_SPAWN +  genTowerHeight());
-
         bounds = new Rectangle(towerPos.x, towerPos.y, tower.getWidth(), tower.getHeight());
     }
 

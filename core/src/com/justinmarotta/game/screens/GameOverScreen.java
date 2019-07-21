@@ -45,8 +45,8 @@ public class GameOverScreen implements Screen {
         game.batch.setProjectionMatrix(gamecam.combined);
         game.batch.begin();
         game.batch.draw(bg, 0, 0);
-        game.batch.draw(gameover, 49, 280);
-        game.batch.draw(playBtn, gamecam.position.x - playBtn.getWidth() / 2, gamecam.position.y);
+        game.batch.draw(gameover, gamecam.position.x - gameover.getWidth() / 2, gamecam.position.y + 50);
+        game.batch.draw(playBtn, gamecam.position.x - playBtn.getWidth() / 2, gamecam.position.y - 50);
         game.batch.end();
     }
 
