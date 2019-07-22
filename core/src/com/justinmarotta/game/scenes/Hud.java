@@ -14,22 +14,22 @@ import com.justinmarotta.game.MarsTrip;
 
 public class Hud implements Disposable {
     public Stage stage;
-    private Viewport viewport;
 
     private Integer worldTime;
     private float timeCount;
     private static Integer score;
 
-    static Label scoreLabel;
-    Label countLabel;
-    Label timeLabel;
-    Label playerLabel;
+    private static Label scoreLabel;
+    private Label countLabel;
 
     public Hud(SpriteBatch sb){
         worldTime = 0;
         timeCount = 0;
         score = 0;
+        Label timeLabel;
+        Label playerLabel;
 
+        Viewport viewport;
         viewport = new FitViewport(MarsTrip.WIDTH, MarsTrip.HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, sb);
 
@@ -37,8 +37,8 @@ public class Hud implements Disposable {
         table.top();
         table.setFillParent(true);
 
-        countLabel = new Label(String.format("%04d", worldTime), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        scoreLabel = new Label(String.format("%07d", score), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        countLabel = new Label(worldTime.toString(), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        scoreLabel = new Label(score.toString(), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         playerLabel = new Label("PLAYER", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
@@ -56,14 +56,14 @@ public class Hud implements Disposable {
         if (timeCount >= 1){
             worldTime++;
             addScore(100);
-            countLabel.setText(String.format("%04d", worldTime));
+            countLabel.setText(worldTime.toString());
             timeCount = 0;
         }
     }
 
     public static void addScore(int value){
         score += value;
-        scoreLabel.setText(String.format("%07d", score));
+        scoreLabel.setText(score.toString());
     }
 
     @Override
