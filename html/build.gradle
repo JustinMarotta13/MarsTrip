@@ -6,7 +6,7 @@ gwt {
     src = files(file("src/")) // Needs to be in front of "modules" below.
     modules 'com.justinmarotta.game.GdxDefinition'
     devModules 'com.justinmarotta.game.GdxDefinitionSuperdev'
-    project.webAppDirName = 'webapp'
+    project.webAppDirName = 'MarsTrip'
 
     compiler {
         strict = true;

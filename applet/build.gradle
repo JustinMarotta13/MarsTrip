@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+
+
+sourceCompatibility = "6"
+targetCompatibility = "6"
+
+dependencies {
+    implementation files('file:///S/ProgrammingProjects/libs/gdx-backend-lwjgl-natives.jar')
+    implementation files('file:///S/ProgrammingProjects/libs/gdx-backend-lwjgl.jar')
+    implementation files('file:///S/ProgrammingProjects/libs/gdx-natives.jar')
+    implementation files('file:///S/ProgrammingProjects/libs/gdx.jar')
+    implementation project(path: ':core')
+}
+
