@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.justinmarotta.game.MarsTrip;
-import com.justinmarotta.game.scenes.Hud;
+import com.justinmarotta.game.scenes.PlayHud;
 import com.justinmarotta.game.sprites.Asteroid;
 import com.justinmarotta.game.sprites.Bullet;
 import com.justinmarotta.game.sprites.Moon;
@@ -38,7 +38,7 @@ public class PlayScreen implements Screen {
     private MarsTrip game;
     private OrthographicCamera gamecam;
     private Viewport gamePort;
-    private Hud hud;
+    private PlayHud playHud;
     private int leftShipBound = 0;
     private int leftShipBoundInc = (Ship.MOVEMENT / 60);
 
@@ -47,6 +47,7 @@ public class PlayScreen implements Screen {
     private Texture bg;
 
     private Texture ground;
+
     private Vector2 groundPos1, groundPos2;
 
     private Ship ship;
@@ -101,7 +102,7 @@ public class PlayScreen implements Screen {
         gamecam = new OrthographicCamera();
         gamePort = new FitViewport((MarsTrip.WIDTH / 2), (MarsTrip.HEIGHT / 2), gamecam);
         gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-        hud = new Hud(game.batch);
+        playHud = new PlayHud(game.batch);
 
         rand = new Random();
 
@@ -239,9 +240,9 @@ public class PlayScreen implements Screen {
         //end game batch
         game.batch.end();
 
-        //draw what hud sees
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        hud.stage.draw();
+        //draw what playHud sees
+        game.batch.setProjectionMatrix(playHud.stage.getCamera().combined);
+        playHud.stage.draw();
     }
 
     public void update(float dt) {
@@ -251,7 +252,7 @@ public class PlayScreen implements Screen {
         gamecam.position.add(leftShipBoundInc, 0, 0);
         leftShipBound = leftShipBound + leftShipBoundInc;
 
-        hud.update(dt);
+        playHud.update(dt);
 
         ship.update(dt);
 
@@ -272,12 +273,11 @@ public class PlayScreen implements Screen {
 
             if (gamecam.position.x - (gamecam.viewportWidth / 2) > asteroid.getPosition().x + asteroid.getTexture().getWidth()){
                 rmAsteroids.add(asteroid);
-                Hud.addScore(50);
+                PlayHud.addScore(50);
             }
 
             if (asteroid.collides(ship.getBounds())) {
-                game.setScreen(new GameOverScreen(game));
-                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+                killPlayer();
             }
         }
 
@@ -287,12 +287,11 @@ public class PlayScreen implements Screen {
 
             if (gamecam.position.x - (gamecam.viewportWidth / 2) > ufo.getPosition().x + ufo.getTexture().getRegionWidth()){
                 rmUfos.add(ufo);
-                Hud.addScore(150);
+                PlayHud.addScore(150);
             }
 
             if (ufo.collides(ship.getBounds())) {
-                game.setScreen(new GameOverScreen(game));
-                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+                killPlayer();
             }
         }
         ufos.removeAll(rmUfos);
@@ -305,7 +304,7 @@ public class PlayScreen implements Screen {
                     rmBullets.add(bullet);
                     smallExplosions.add(new SmallExplosion(asteroid.getPosition().x, asteroid.getPosition().y, Asteroid.MOVEMENT));
                     MarsTrip.manager.get("audio/smallexplosion.ogg", Sound.class).play();
-                    Hud.addScore(250);
+                    PlayHud.addScore(250);
                 }
             }
         }
@@ -326,12 +325,11 @@ public class PlayScreen implements Screen {
 
             if (gamecam.position.x - (gamecam.viewportWidth / 2) > tower.getTowerPos().x + tower.getTexture().getWidth()) {
                 rmTowers.add(tower);
-                Hud.addScore(100);
+                PlayHud.addScore(100);
             }
 
             if (tower.collides(ship.getBounds())){
-                game.setScreen(new GameOverScreen(game));
-                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+                killPlayer();
             }
         }
         towers.removeAll(rmTowers);
@@ -342,12 +340,11 @@ public class PlayScreen implements Screen {
 
             if (gamecam.position.x - (gamecam.viewportWidth / 2) > moon.getPosition().x + moon.getTexture().getWidth()){
                 rmMoons.add(moon);
-                Hud.addScore(200);
+                PlayHud.addScore(200);
             }
 
             if (moon.collides(ship.getBounds())) {
-                game.setScreen(new GameOverScreen(game));
-                MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+                killPlayer();
             }
         }
         moons.removeAll(rmMoons);
@@ -382,6 +379,12 @@ public class PlayScreen implements Screen {
             groundPos1.add(ground.getWidth() * 2, 0);
         if (gamecam.position.x - (gamecam.viewportWidth / 2)  > groundPos2.x + ground.getWidth())
             groundPos2.add(ground.getWidth() * 2, 0);
+    }
+
+    private void killPlayer(){
+        game.setScreen(new GameOverScreen(game));
+        MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
+
     }
 
     @Override

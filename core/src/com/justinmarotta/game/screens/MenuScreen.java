@@ -14,7 +14,7 @@ import static com.badlogic.gdx.Input.Keys.SPACE;
 
 public class MenuScreen implements Screen {
     private MarsTrip game;
-    private OrthographicCamera gamecam;
+    private OrthographicCamera gameCam;
     private Viewport gamePort;
 
     private Texture bg;
@@ -23,9 +23,9 @@ public class MenuScreen implements Screen {
 
     public MenuScreen(MarsTrip game){
         this.game = game;
-        gamecam = new OrthographicCamera();
-        gamePort = new FitViewport((MarsTrip.WIDTH / 2), (MarsTrip.HEIGHT / 2), gamecam);
-        gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+        gameCam = new OrthographicCamera();
+        gamePort = new FitViewport((MarsTrip.WIDTH / 2), (MarsTrip.HEIGHT / 2), gameCam);
+        gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         bg = new Texture("bg.png");
         playBtn = new Texture("playbtn.png");
         title = new Texture("title.png");
@@ -37,6 +37,10 @@ public class MenuScreen implements Screen {
             game.setScreen(new PlayScreen(game));
             MarsTrip.playMusic();
         }
+        if (Gdx.input.justTouched()) {
+            game.setScreen(new PlayScreen(game));
+            MarsTrip.playMusic();
+        }
     }
 
     @Override
@@ -44,11 +48,11 @@ public class MenuScreen implements Screen {
         update(delta);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        game.batch.setProjectionMatrix(gamecam.combined);
+        game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         game.batch.draw(bg, 0, 0);
-        game.batch.draw(title, gamecam.position.x - title.getWidth() / 2, gamecam.position.y + 50);
-        game.batch.draw(playBtn, gamecam.position.x - playBtn.getWidth() / 2, gamecam.position.y - 50);
+        game.batch.draw(title, gameCam.position.x - title.getWidth() / 2, gameCam.position.y + 50);
+        game.batch.draw(playBtn, gameCam.position.x - playBtn.getWidth() / 2, gameCam.position.y - 50);
         game.batch.end();
     }
 

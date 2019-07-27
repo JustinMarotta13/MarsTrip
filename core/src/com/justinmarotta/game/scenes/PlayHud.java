@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.justinmarotta.game.MarsTrip;
 
-public class Hud implements Disposable {
+public class PlayHud implements Disposable {
     public Stage stage;
 
     private Integer worldTime;
@@ -22,7 +22,7 @@ public class Hud implements Disposable {
     private static Label scoreLabel;
     private Label countLabel;
 
-    public Hud(SpriteBatch sb){
+    public PlayHud(SpriteBatch sb){
         worldTime = 0;
         timeCount = 0;
         score = 0;

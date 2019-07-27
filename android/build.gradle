@@ -26,7 +26,7 @@ android {
     }
     defaultConfig {
         applicationId "com.justinmarotta.game"
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -38,6 +38,7 @@ android {
         }
         debug {
             signingConfig signingConfigs.debug
+            applicationIdSuffix = appName
         }
     }
 }
