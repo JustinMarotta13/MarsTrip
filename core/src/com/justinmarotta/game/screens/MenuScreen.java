@@ -33,7 +33,7 @@ public class MenuScreen implements Screen {
     }
 
     public void handleInput(float dt) {
-        if (Gdx.input.isKeyJustPressed(SPACE)){
+        if (Gdx.input.isKeyJustPressed(SPACE) || Gdx.input.justTouched()){
             game.setScreen(new PlayScreen(game));
             MarsTrip.playMusic();
         }
