@@ -53,10 +53,10 @@ public class PlayScreen implements Screen {
 
     private Vector2 groundPos1, groundPos2;
 
-    private Ship ship;
+    private static Ship ship;
 
     //bullets
-    private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+    private static ArrayList<Bullet> bullets = new ArrayList<Bullet>();
     private ArrayList<Bullet> rmBullets = new ArrayList<Bullet>();
 
     //asteroids
@@ -96,7 +96,7 @@ public class PlayScreen implements Screen {
 
     //small explosions
     private ArrayList<SmallExplosion> smallExplosions = new ArrayList<SmallExplosion>();
-    private  ArrayList<SmallExplosion> rmSmallExplosions = new ArrayList<SmallExplosion>();
+    private ArrayList<SmallExplosion> rmSmallExplosions = new ArrayList<SmallExplosion>();
 
 
     //Constructor
@@ -165,9 +165,8 @@ public class PlayScreen implements Screen {
         if (TouchPad.touchpad.getKnobPercentX() > 0 && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth())
             ship.moveRight(TouchPad.touchpad.getKnobPercentX() * 3);
 
-        if (Gdx.input.isKeyJustPressed(SPACE) || TouchPad.fireBtn.isPressed()){
-            bullets.add(new Bullet(ship.position.x + 20, ship.position.y + 8));
-            MarsTrip.manager.get("audio/bullet.ogg", Sound.class).play();
+        if (Gdx.input.isKeyJustPressed(SPACE)){
+            shoot();
         }
     }
 
@@ -401,6 +400,11 @@ public class PlayScreen implements Screen {
         game.setScreen(new GameOverScreen(game));
         MarsTrip.manager.get("audio/ship.ogg", Sound.class).stop();
 
+    }
+
+    public static void shoot(){
+        bullets.add(new Bullet(ship.position.x + 20, ship.position.y + 8));
+        MarsTrip.manager.get("audio/bullet.ogg", Sound.class).play();
     }
 
     @Override
