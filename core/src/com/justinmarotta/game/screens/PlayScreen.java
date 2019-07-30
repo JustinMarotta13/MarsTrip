@@ -116,7 +116,7 @@ public class PlayScreen implements Screen {
         groundPos1 = new Vector2(gamePort.getScreenWidth(), 0);
         groundPos2 = new Vector2(ground.getWidth(), 0);
 
-        ship = new Ship(55, 200);
+        ship = new Ship((gamePort.getWorldWidth() / 4) - 60, gamePort.getWorldHeight() / 2);
         MarsTrip.manager.get("audio/ship.ogg", Sound.class).loop(.05f);
 
 
@@ -139,22 +139,33 @@ public class PlayScreen implements Screen {
 
     public void handleInput(float dt) {
         if (Gdx.input.isKeyPressed(W) && ship.position.y < (gamePort.getWorldHeight() - 40))
-            ship.moveUp();
+            ship.moveUp(5);
         if (Gdx.input.isKeyPressed(S) && ship.position.y > ground.getHeight())
-            ship.moveDown();
+            ship.moveDown(-5);
         if (Gdx.input.isKeyPressed(A) && ship.position.x > leftShipBound)
-            ship.moveLeft();
+            ship.moveLeft(-4);
         if (Gdx.input.isKeyPressed(D) && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth())
-            ship.moveRight();
+            ship.moveRight(3);
+
         if (Gdx.input.isKeyPressed(UP) && ship.position.y < (gamePort.getWorldHeight() - 40) && !Gdx.input.isKeyPressed(W))
-            ship.moveUp();
+            ship.moveUp(5);
         if (Gdx.input.isKeyPressed(DOWN) && ship.position.y > ground.getHeight() && !Gdx.input.isKeyPressed(S))
-            ship.moveDown();
+            ship.moveDown(-5);
         if (Gdx.input.isKeyPressed(LEFT) && ship.position.x > leftShipBound && !Gdx.input.isKeyPressed(A))
-            ship.moveLeft();
+            ship.moveLeft(-4);
         if (Gdx.input.isKeyPressed(RIGHT) && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth() && !Gdx.input.isKeyPressed(D))
-            ship.moveRight();
-        if (Gdx.input.isKeyJustPressed(SPACE)) {
+            ship.moveRight(3);
+
+        if (TouchPad.touchpad.getKnobPercentY() > 0 && ship.position.y < (gamePort.getWorldHeight() - 40))
+            ship.moveUp(TouchPad.touchpad.getKnobPercentY() * 5);
+        if (TouchPad.touchpad.getKnobPercentY() < 0 && ship.position.y > ground.getHeight())
+            ship.moveDown(TouchPad.touchpad.getKnobPercentY() * 5);
+        if (TouchPad.touchpad.getKnobPercentX() < 0 && ship.position.x > leftShipBound)
+            ship.moveLeft(TouchPad.touchpad.getKnobPercentX() * 4);
+        if (TouchPad.touchpad.getKnobPercentX() > 0 && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth())
+            ship.moveRight(TouchPad.touchpad.getKnobPercentX() * 3);
+
+        if (Gdx.input.isKeyJustPressed(SPACE) || TouchPad.fireBtn.isPressed()){
             bullets.add(new Bullet(ship.position.x + 20, ship.position.y + 8));
             MarsTrip.manager.get("audio/bullet.ogg", Sound.class).play();
         }

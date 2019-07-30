@@ -13,7 +13,7 @@ public class Ship {
     private Animation animation;
     private Texture texture;
 
-    public Ship(int x, int y) {
+    public Ship(float x, float y) {
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
         texture = new Texture("shipanimation.png");
@@ -30,20 +30,20 @@ public class Ship {
         bounds.setPosition(position.x, position.y);
     }
 
-    public void moveUp(){
-        position.add(0, 5, 0);
+    public void moveUp(float y){
+        position.add(0, y, 0);
     }
 
-    public void moveDown(){
-        position.add(0, -5, 0);
+    public void moveDown(float y){
+        position.add(0, y, 0);
     }
 
-    public void moveLeft(){
-        position.add(-4, 0, 0);
+    public void moveLeft(float x){
+        position.add(x, 0, 0);
     }
 
-    public void moveRight(){
-        position.add(3, 0, 0);
+    public void moveRight(float x){
+        position.add(x, 0, 0);
     }
 
     public TextureRegion getTexture() {
