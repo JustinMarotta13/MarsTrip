@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.justinmarotta.game.MarsTrip;
 import com.justinmarotta.game.scenes.PlayHud;
+import com.justinmarotta.game.scenes.TouchPad;
 import com.justinmarotta.game.sprites.Asteroid;
 import com.justinmarotta.game.sprites.Bullet;
 import com.justinmarotta.game.sprites.Moon;
@@ -39,6 +41,7 @@ public class PlayScreen implements Screen {
     private OrthographicCamera gamecam;
     private Viewport gamePort;
     private PlayHud playHud;
+    private TouchPad touchPad;
     private int leftShipBound = 0;
     private int leftShipBoundInc = (Ship.MOVEMENT / 60);
 
@@ -103,6 +106,7 @@ public class PlayScreen implements Screen {
         gamePort = new FitViewport((MarsTrip.WIDTH / 2), (MarsTrip.HEIGHT / 2), gamecam);
         gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         playHud = new PlayHud(game.batch);
+        touchPad = new TouchPad(game.batch);
 
         rand = new Random();
 
@@ -243,6 +247,7 @@ public class PlayScreen implements Screen {
         //draw what playHud sees
         game.batch.setProjectionMatrix(playHud.stage.getCamera().combined);
         playHud.stage.draw();
+        touchPad.stage.draw();
     }
 
     public void update(float dt) {

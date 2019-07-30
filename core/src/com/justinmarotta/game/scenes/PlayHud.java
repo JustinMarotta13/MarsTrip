@@ -23,6 +23,7 @@ public class PlayHud implements Disposable {
     private Label countLabel;
 
     public PlayHud(SpriteBatch sb){
+
         worldTime = 0;
         timeCount = 0;
         score = 0;
