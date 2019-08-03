@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.justinmarotta.game.MarsTrip;
@@ -437,6 +436,7 @@ public class PlayScreen implements Screen {
         bg.dispose();
         ship.dispose();
         ground.dispose();
+        touchPad.dispose();
         for (Tower tower : towers){
             tower.dispose();
         }
