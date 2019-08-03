@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -41,8 +42,8 @@ public class PlayScreen implements Screen {
     private Viewport gamePort;
     private PlayHud playHud;
     private TouchPad touchPad;
-    private int leftShipBound = 0;
-    private int leftShipBoundInc = (Ship.MOVEMENT / 60);
+    private Rectangle camBound;
+    private float camInc;
 
     private Random rand;
 
@@ -104,6 +105,7 @@ public class PlayScreen implements Screen {
         gamecam = new OrthographicCamera();
         gamePort = new FitViewport((MarsTrip.WIDTH / 2), (MarsTrip.HEIGHT / 2), gamecam);
         gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+        camBound = new Rectangle(0, 0, gamePort.getWorldWidth(), gamePort.getWorldHeight());
         playHud = new PlayHud(game.batch);
         touchPad = new TouchPad(game.batch);
 
@@ -115,7 +117,7 @@ public class PlayScreen implements Screen {
         groundPos1 = new Vector2(gamePort.getScreenWidth(), 0);
         groundPos2 = new Vector2(ground.getWidth(), 0);
 
-        ship = new Ship((gamePort.getWorldWidth() / 4) - 60, gamePort.getWorldHeight() / 2);
+        ship = new Ship((gamePort.getWorldWidth() / 4), gamePort.getWorldHeight() / 2);
         MarsTrip.manager.get("audio/ship.ogg", Sound.class).loop(.05f);
 
 
@@ -141,27 +143,27 @@ public class PlayScreen implements Screen {
             ship.moveUp(5);
         if (Gdx.input.isKeyPressed(S) && ship.position.y > ground.getHeight())
             ship.moveDown(-5);
-        if (Gdx.input.isKeyPressed(A) && ship.position.x > leftShipBound)
+        if (Gdx.input.isKeyPressed(A) && ship.position.x > camBound.getX())
             ship.moveLeft(-4);
-        if (Gdx.input.isKeyPressed(D) && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth())
+        if (Gdx.input.isKeyPressed(D) && ship.position.x < (camBound.getX() + camBound.getWidth() - ship.getTexture().getRegionWidth()))
             ship.moveRight(3);
 
         if (Gdx.input.isKeyPressed(UP) && ship.position.y < (gamePort.getWorldHeight() - 40) && !Gdx.input.isKeyPressed(W))
             ship.moveUp(5);
         if (Gdx.input.isKeyPressed(DOWN) && ship.position.y > ground.getHeight() && !Gdx.input.isKeyPressed(S))
             ship.moveDown(-5);
-        if (Gdx.input.isKeyPressed(LEFT) && ship.position.x > leftShipBound && !Gdx.input.isKeyPressed(A))
+        if (Gdx.input.isKeyPressed(LEFT) && ship.position.y > camBound.getX() && !Gdx.input.isKeyPressed(A))
             ship.moveLeft(-4);
-        if (Gdx.input.isKeyPressed(RIGHT) && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth() && !Gdx.input.isKeyPressed(D))
+        if (Gdx.input.isKeyPressed(RIGHT) && ship.position.x < (camBound.getX() + camBound.getWidth() - ship.getTexture().getRegionWidth()) && !Gdx.input.isKeyPressed(D))
             ship.moveRight(3);
 
         if (TouchPad.touchpad.getKnobPercentY() > 0 && ship.position.y < (gamePort.getWorldHeight() - 40))
             ship.moveUp(TouchPad.touchpad.getKnobPercentY() * 5);
         if (TouchPad.touchpad.getKnobPercentY() < 0 && ship.position.y > ground.getHeight())
             ship.moveDown(TouchPad.touchpad.getKnobPercentY() * 5);
-        if (TouchPad.touchpad.getKnobPercentX() < 0 && ship.position.x > leftShipBound)
+        if (TouchPad.touchpad.getKnobPercentX() < 0 && ship.position.x > camBound.getX())
             ship.moveLeft(TouchPad.touchpad.getKnobPercentX() * 4);
-        if (TouchPad.touchpad.getKnobPercentX() > 0 && ship.position.x < leftShipBound + gamePort.getWorldWidth() - ship.getTexture().getRegionWidth())
+        if (TouchPad.touchpad.getKnobPercentX() > 0 && ship.position.x < (camBound.getX() + camBound.getWidth() - ship.getTexture().getRegionWidth()))
             ship.moveRight(TouchPad.touchpad.getKnobPercentX() * 3);
 
         if (Gdx.input.isKeyJustPressed(SPACE)){
@@ -179,7 +181,7 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(gamecam.combined);
         game.batch.begin();
 
-        game.batch.draw(bg, leftShipBound, 0);
+        game.batch.draw(bg, gamecam.position.x - (gamePort.getWorldWidth() / 2), 0);
 
         //draw moons
         moonSpawnTimer -= delta;
@@ -263,8 +265,9 @@ public class PlayScreen implements Screen {
         handleInput(dt);
 
         //cam positioning
-        gamecam.position.add(leftShipBoundInc, 0, 0);
-        leftShipBound = leftShipBound + leftShipBoundInc;
+        camInc = (Ship.MOVEMENT / (1 / dt));
+        gamecam.position.add(camInc, 0, 0);
+        camBound.setX(gamecam.position.x - (gamePort.getWorldWidth() / 2));
 
         playHud.update(dt);
 

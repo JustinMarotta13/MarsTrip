@@ -58,6 +58,10 @@ public class Ship {
         return bounds;
     }
 
+    public boolean collides(Rectangle rect){
+        return rect.overlaps(bounds);
+    }
+
     public void dispose() {
         texture.dispose();
     }
