@@ -49,7 +49,7 @@ public class TouchPad implements Disposable {
         touchpadStyle.knob = touchKnob;
 
         touchpad = new Touchpad(10, touchpadStyle);
-        touchpad.setBounds((viewport.getWorldWidth() - ((viewport.getWorldWidth() / 4) * 3)) - 75, 60, 150, 150);
+        touchpad.setBounds((viewport.getWorldWidth() - ((viewport.getWorldWidth() / 4) * 3)) - 100, 25, 175, 175);
 
         Skin fireBtnSkin = new Skin();
         fireBtnSkin.add("fireBtnUp", new Texture("fireBtnUp.png"));
@@ -64,7 +64,7 @@ public class TouchPad implements Disposable {
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
-        fireBtn.setBounds(viewport.getWorldWidth() - (viewport.getWorldWidth() / 4) - 25, 100, 72, 72);
+        fireBtn.setBounds(viewport.getWorldWidth() - (viewport.getWorldWidth() / 4) - 25, 60, 100, 100);
 
 
         stage = new Stage(viewport, sb);
