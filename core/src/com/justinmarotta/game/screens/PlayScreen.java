@@ -38,8 +38,8 @@ import static com.badlogic.gdx.Input.Keys.W;
 public class PlayScreen implements Screen {
 
     private MarsTrip game;
-    private OrthographicCamera gamecam;
-    private Viewport gamePort;
+    public OrthographicCamera gamecam;
+    public Viewport gamePort;
     private PlayHud playHud;
     private TouchPad touchPad;
     private Rectangle camBound;
@@ -47,11 +47,12 @@ public class PlayScreen implements Screen {
 
     private Random rand;
 
-    private Texture bg;
+    private Texture stars;
+    private Texture hills;
 
     private Texture ground;
 
-    private Vector2 groundPos1, groundPos2;
+    private Vector2 starsPos1, starsPos2, hillsPos1, hillsPos2, groundPos1, groundPos2;
 
     private static Ship ship;
 
@@ -61,36 +62,36 @@ public class PlayScreen implements Screen {
 
     //asteroids
     private float asteroidSpawnTimer;
-    private static final float MIN_ASTEROID_SPAWN_TIME = .5f;
+    private static final float MIN_ASTEROID_SPAWN_TIME = .25f;
     private static final float MAX_ASTEROID_SPAWN_TIME = 1.75f;
     private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
     private ArrayList<Asteroid> rmAsteroids = new ArrayList<Asteroid>();
 
     //towers
     private double towerSpawnTimer = 0;
-    private static final float MIN_TOWER_SPAWN_TIME = 2f;
-    private static final float MAX_TOWER_SPAWN_TIME = 8f;
+    private static final float MIN_TOWER_SPAWN_TIME = 1f;
+    private static final float MAX_TOWER_SPAWN_TIME = 5f;
     private ArrayList<Tower> towers = new ArrayList<Tower>();
     private ArrayList<Tower> rmTowers = new ArrayList<Tower>();
 
     //moons
     private float moonSpawnTimer = 0;
     private static final float MIN_MOON_SPAWN_TIME = 5f;
-    private static final float MAX_MOON_SPAWN_TIME = 15f;
+    private static final float MAX_MOON_SPAWN_TIME = 12f;
     private ArrayList<Moon> moons = new ArrayList<Moon>();
     private ArrayList<Moon> rmMoons = new ArrayList<Moon>();
 
     //ufos
     private float ufoSpawnTimer = 0;
     private static final float MIN_UFO_SPAWN_TIME = 3f;
-    private static final float MAX_UFO_SPAWN_TIME = 10f;
+    private static final float MAX_UFO_SPAWN_TIME = 8f;
     private ArrayList<UFO> ufos = new ArrayList<UFO>();
     private ArrayList<UFO> rmUfos = new ArrayList<UFO>();
 
     //rovers
     private float roverSpawnTimer = 0;
-    private static final float MIN_ROVER_SPAWN_TIME = 15f;
-    private static final float MAX_ROVER_SPAWN_TIME = 30f;
+    private static final float MIN_ROVER_SPAWN_TIME = 10f;
+    private static final float MAX_ROVER_SPAWN_TIME = 25f;
     private ArrayList<Rover> rovers = new ArrayList<Rover>();
     private ArrayList<Rover> rmRovers = new ArrayList<Rover>();
 
@@ -111,7 +112,13 @@ public class PlayScreen implements Screen {
 
         rand = new Random();
 
-        bg = new Texture("bg.png");
+        stars = new Texture("stars.png");
+        starsPos1 = new Vector2(gamePort.getScreenWidth(), 0);
+        starsPos2 = new Vector2(stars.getWidth(), 0);
+
+        hills = new Texture("hills.png");
+        hillsPos1 = new Vector2(gamePort.getScreenWidth(), 0);
+        hillsPos2 = new Vector2(hills.getWidth(), 0);
 
         ground = new Texture("ground.png");
         groundPos1 = new Vector2(gamePort.getScreenWidth(), 0);
@@ -181,7 +188,10 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(gamecam.combined);
         game.batch.begin();
 
-        game.batch.draw(bg, gamecam.position.x - (gamePort.getWorldWidth() / 2), 0);
+        game.batch.draw(stars, starsPos1.x, starsPos1.y);
+        game.batch.draw(stars, starsPos2.x, starsPos2.y);
+        game.batch.draw(hills, hillsPos1.x, hillsPos1.y);
+        game.batch.draw(hills, hillsPos2.x, hillsPos2.y);
 
         //draw moons
         moonSpawnTimer -= delta;
@@ -258,7 +268,10 @@ public class PlayScreen implements Screen {
         //draw what playHud sees
         game.batch.setProjectionMatrix(playHud.stage.getCamera().combined);
         playHud.stage.draw();
-        touchPad.stage.draw();
+
+        if (MenuScreen.touchUser) {
+            touchPad.stage.draw();
+        }
     }
 
     public void update(float dt) {
@@ -273,6 +286,8 @@ public class PlayScreen implements Screen {
 
         ship.update(dt);
 
+        updateStars(220 * dt);
+        updateHills(100 * dt);
         updateGround();
 
         //update bullets
@@ -391,6 +406,24 @@ public class PlayScreen implements Screen {
         gamecam.update();
     }
 
+    private void updateStars(float x){
+        starsPos1.add(x, 0);
+        starsPos2.add(x, 0);
+        if (gamecam.position.x - (gamecam.viewportWidth / 2) > starsPos1.x + stars.getWidth())
+            starsPos1.add(stars.getWidth() * 2, 0);
+        if (gamecam.position.x - (gamecam.viewportWidth / 2)  > starsPos2.x + stars.getWidth())
+            starsPos2.add(stars.getWidth() * 2, 0);
+    }
+
+    private void updateHills(float x){
+        hillsPos1.add(x, 0);
+        hillsPos2.add(x, 0);
+        if (gamecam.position.x - (gamecam.viewportWidth / 2) > hillsPos1.x + hills.getWidth())
+            hillsPos1.add(hills.getWidth() * 2, 0);
+        if (gamecam.position.x - (gamecam.viewportWidth / 2)  > hillsPos2.x + hills.getWidth())
+            hillsPos2.add(hills.getWidth() * 2, 0);
+    }
+
     private void updateGround(){
         if (gamecam.position.x - (gamecam.viewportWidth / 2) > groundPos1.x + ground.getWidth())
             groundPos1.add(ground.getWidth() * 2, 0);
@@ -436,7 +469,8 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-        bg.dispose();
+        stars.dispose();
+        hills.dispose();
         ship.dispose();
         ground.dispose();
         touchPad.dispose();

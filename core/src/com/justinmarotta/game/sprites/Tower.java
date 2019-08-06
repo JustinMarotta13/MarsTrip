@@ -25,7 +25,7 @@ public class Tower {
     }
 
     private int genTowerHeight(){
-        towerHeight = rand.nextInt(MarsTrip.HEIGHT / 4);
+        towerHeight = rand.nextInt((MarsTrip.HEIGHT / 4) - 100);
         return towerHeight;
     }
 

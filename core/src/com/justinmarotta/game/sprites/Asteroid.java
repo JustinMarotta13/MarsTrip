@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.justinmarotta.game.MarsTrip;
 
 public class Asteroid {
-    public static final int MOVEMENT = -100;
+    public static final int MOVEMENT = -150;
     public static final int MIN_HEIGHT = 20;
     public static final int MAX_HEIGHT = (MarsTrip.HEIGHT / 2) - MIN_HEIGHT - 40;
     private Vector3 position;

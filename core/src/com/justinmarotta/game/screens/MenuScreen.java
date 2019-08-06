@@ -17,29 +17,37 @@ public class MenuScreen implements Screen {
     private OrthographicCamera gameCam;
     private Viewport gamePort;
 
-    private Texture bg;
+    private Texture stars;
+    private Texture hills;
+    private Texture ground;
     private Texture playBtn;
     private Texture title;
+
+    public static boolean touchUser;
 
     public MenuScreen(MarsTrip game){
         this.game = game;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport((MarsTrip.WIDTH / 2), (MarsTrip.HEIGHT / 2), gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-        bg = new Texture("bg.png");
+        stars = new Texture("stars.png");
+        hills = new Texture("hills.png");
+        ground = new Texture("ground.png");
         playBtn = new Texture("playbtn.png");
         title = new Texture("title.png");
+        touchUser = false;
 
     }
 
     public void handleInput(float dt) {
-        if (Gdx.input.isKeyJustPressed(SPACE) || Gdx.input.justTouched()){
+        if (Gdx.input.isKeyJustPressed(SPACE)){
             game.setScreen(new PlayScreen(game));
             MarsTrip.playMusic();
         }
-        if (Gdx.input.justTouched()) {
+        if (Gdx.input.justTouched()){
             game.setScreen(new PlayScreen(game));
             MarsTrip.playMusic();
+            touchUser = true;
         }
     }
 
@@ -50,7 +58,9 @@ public class MenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
-        game.batch.draw(bg, 0, 0);
+        game.batch.draw(stars, 0, 0);
+        game.batch.draw(hills, 0, 0);
+        game.batch.draw(ground, 0, 0);
         game.batch.draw(title, gameCam.position.x - title.getWidth() / 2, gameCam.position.y + 50);
         game.batch.draw(playBtn, gameCam.position.x - playBtn.getWidth() / 2, gameCam.position.y - 50);
         game.batch.end();
@@ -88,7 +98,9 @@ public class MenuScreen implements Screen {
     @Override
     public void dispose() {
         title.dispose();
-        bg.dispose();
+        stars.dispose();
+        hills.dispose();
+        ground.dispose();
         playBtn.dispose();
     }
 }
